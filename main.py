@@ -1,10 +1,10 @@
-
+from ui_login import LoginFrame
 
 
 
 def main():
-    pass
-
+    app = LoginFrame()
+    app.mainloop()
 
 
 
