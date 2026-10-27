@@ -6,7 +6,7 @@ class BankDatabase:
     def __init__(self , db_name = "Bank_system.db"):
         self.conn = sqlite3.connect(db_name)
         self.conn.execute("PRAGMA foreign_keys = ON;")
-        self.cur = sqlite3.Cursor()
+        self.cur = self.conn.cursor()
 
     def create_table(self):
         self.cur.execute("""
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS transactions (
 )
 """)
         self.conn.commit()
-    # incrypt passowrd
+    # hash password
     def _hash_pwd(self, password:str, rounds=12) -> bytes:
         password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(rounds))
         return password
@@ -60,7 +60,7 @@ INSERT INTO accounts (account_no , user_id , balance) VALUES (?,?,?)
             print(f"[ERROR] Username '{username}' already exists.")
             return False , "Register invalid"
 
-    # Check passowrd is correctly
+    # Check password is correctly
     def _check_pwd(self , password:str , hash:bytes) -> bool:
         return bcrypt.checkpw(password.encode() , hash)
 
