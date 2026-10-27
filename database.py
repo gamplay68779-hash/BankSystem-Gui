@@ -6,12 +6,12 @@ class BankDatabase:
     def __init__(self , db_name = "Bank_system.db"):
         self.conn = sqlite3.connect(db_name)
         self.conn.execute("PRAGMA foreign_keys = ON;")
-        self.cur = sqlite3.Cursor()
+        self.cur = self.conn.cursor()
 
     def create_table(self):
         self.cur.execute("""
 CREATE TABLE IF NOT EXISTS users (
-    id INTERGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     salt TEXT NOT NULL
@@ -35,16 +35,16 @@ CREATE TABLE IF NOT EXISTS transactions (
 )
 """)
         self.conn.commit()
-    # incrypt passowrd
-    def _hash_pwd(self , passowrd:str , rounds=12) -> bytes:
-        passowrd = bcrypt.hashpw(passowrd.encode("utf-8") , bcrypt.gensalt(rounds))
-        return passowrd
+    # hash password
+    def _hash_pwd(self, password:str, rounds=12) -> bytes:
+        password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(rounds))
+        return password
     
     # Register
-    def register_user(self , passowrd:str , username:str , initial_deposit:float=0.0):
+    def register_user(self, password:str, username:str, initial_deposit:float=0.0):
         try:
             salt = 12
-            pwd_hash = self._hash_pwd(passowrd , salt)
+            pwd_hash = self._hash_pwd(password, salt)
             self.cur.execute("""
 INSERT INTO users (username , password_hash ,salt) VALUES (? , ? ,?)
 """ , (username , pwd_hash , salt),)
@@ -60,13 +60,13 @@ INSERT INTO accounts (account_no , user_id , balance) VALUES (?,?,?)
             print(f"[ERROR] Username '{username}' already exists.")
             return False , "Register invalid"
 
-    # Check passowrd is correctly
+    # Check password is correctly
     def _check_pwd(self , password:str , hash:bytes) -> bool:
         return bcrypt.checkpw(password.encode() , hash)
 
 
     # Login
-    def login(self , username : str , passowrd:str):
+    def login(self, username : str, password:str):
 
         self.cur.execute("""
 SELECT id , password_hash FROM users WHERE username = ?
@@ -79,7 +79,7 @@ SELECT id , password_hash FROM users WHERE username = ?
 
         user_id , pwd_hash = user
 
-        if not self._check_pwd(passowrd , pwd_hash):
+        if not self._check_pwd(password , pwd_hash):
             return None , "Login info invalid..."
 
         return user_id
