@@ -236,5 +236,41 @@ class SignupPage(ctk.CTkFrame):
         self.com_password_entry.grid(row=4, column=0, columnspan=2, pady=(5, 5), sticky="")
 
         self.register_btn = ctk.CTkButton(self, text="Register", width=200, height=50, border_width=3, corner_radius=10,
-                                          font=ctk.CTkFont(family="Arial", size=20, weight="bold"), fg_color="#092453")
+                                          font=ctk.CTkFont(family="Arial", size=20, weight="bold"), fg_color="#092453" , command=self.on_click_register)
         self.register_btn.grid(row=5, column=0, columnspan=2, pady=(15, 5), sticky="")
+
+    def on_click_register(self):
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        com_password = self.com_password_entry.get()
+
+        if username == "" or password == "" or com_password == "":
+            self.show_custom_warning("Missing Fields", "Please fill in all fields!")
+
+    def show_custom_warning(self, title, message):
+        popup = ctk.CTkToplevel(self)
+        popup.geometry("320x160")
+        popup.title(title)
+        popup.resizable(False, False)
+        popup.grab_set()
+
+        msg_label = ctk.CTkLabel(
+            popup,
+            text=message,
+            font=ctk.CTkFont(family="Arial", size=16, weight="bold"),
+            text_color="#092453",
+            wraplength=280,
+        )
+        msg_label.pack(pady=(25, 15))
+
+        ok_btn = ctk.CTkButton(
+            popup,
+            text="OK",
+            width=100,
+            height=35,
+            fg_color="#092453",
+            text_color="#FFFFFF",
+            font=ctk.CTkFont(family="Arial", size=12, weight="bold"),
+            command=popup.destroy,
+        )
+        ok_btn.pack(pady=10)
